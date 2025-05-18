@@ -3,10 +3,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: ${NODE_ENV:-development}
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NODE_ENV: ${NODE_ENV:-development}
     image: deer-flow-web
     ports:
       - "3000:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
     env_file:
       - .env
