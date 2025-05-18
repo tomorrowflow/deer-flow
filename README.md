@@ -164,10 +164,14 @@ DeerFlow supports multiple search engines that can be configured in your `.env` 
   - No API key required
   - Specialized for scientific and academic papers
 
+- **SearxNG**: Self-hosted, privacy-focused metasearch engine
+  - Requires `SEARXNG_BASE_URL` in your `.env` file
+  - Allows you to use your own SearxNG instance
+
 To configure your preferred search engine, set the `SEARCH_API` variable in your `.env` file:
 
 ```bash
-# Choose one: tavily, duckduckgo, brave_search, arxiv
+# Choose one: tavily, duckduckgo, brave_search, arxiv, searxng
 SEARCH_API=tavily
 ```
 
@@ -186,8 +190,26 @@ SEARCH_API=tavily
 - 🔍 **Search and Retrieval**
 
   - Web search via Tavily, Brave Search and more
-  - Crawling with Jina
+  - Crawling with Jina or Crawl4AI
   - Advanced content extraction
+
+## Supported Crawlers
+
+DeerFlow supports multiple web crawlers that can be configured in your `.env` file using the `CRAWLER_TYPE` variable:
+
+- **Jina** (default): A powerful crawler for web content extraction
+  - Optionally requires `JINA_API_KEY` in your `.env` file
+
+- **Crawl4AI**: An alternative crawler service
+  - Requires `CRAWL4AI_URL` in your `.env` file
+  - Example: `CRAWL4AI_URL="http://localhost:11235/crawl"`
+
+To configure your preferred crawler, set the `CRAWLER_TYPE` variable in your `.env` file:
+
+```bash
+# Choose one: jina, crawl4ai
+CRAWLER_TYPE=jina
+```
 
 - 🔗 **MCP Seamless Integration**
   - Expand capabilities for private domain access, knowledge graph, web browsing and more

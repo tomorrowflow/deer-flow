@@ -19,9 +19,18 @@ def crawl_tool(
 ) -> str:
     """Use this to crawl a url and get a readable content in markdown format."""
     try:
+        logger.info(f"Initializing crawler for URL: {url}")
         crawler = Crawler()
+        
+        logger.info(f"Starting to crawl URL: {url}")
         article = crawler.crawl(url)
-        return {"url": url, "crawled_content": article.to_markdown()[:1000]}
+        
+        logger.info(f"Successfully crawled URL: {url}, converting to markdown")
+        markdown_content = article.to_markdown()
+        
+        logger.info(f"Markdown conversion complete, content length: {len(markdown_content)} characters")
+        # Return the full markdown content as a string to match the return type annotation
+        return markdown_content
     except BaseException as e:
         error_msg = f"Failed to crawl. Error: {repr(e)}"
         logger.error(error_msg)

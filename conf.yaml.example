@@ -7,3 +7,8 @@ BASIC_MODEL:
   base_url: https://ark.cn-beijing.volces.com/api/v3
   model: "doubao-1-5-pro-32k-250115"
   api_key: xxxx
+
+# Tool configurations
+tools:
+  # crawler_type: "jina"  # "jina" or "crawl4ai"
+  # crawl4ai_url: ""    # URL for crawl4ai service if used

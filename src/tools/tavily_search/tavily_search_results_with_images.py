@@ -104,8 +104,17 @@ class TavilySearchResultsWithImages(TavilySearchResults):  # type: ignore[overri
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> Tuple[Union[List[Dict[str, str]], str], Dict]:
         """Use the tool."""
+        import logging
+        import time
+        
+        logger = logging.getLogger(__name__)
+        logger.info(f"TavilySearch: Starting search for query: '{query}'")
+        
         # TODO: remove try/except, should be handled by BaseTool
         try:
+            logger.info(f"TavilySearch: Calling Tavily API with query: '{query}', max_results: {self.max_results}")
+            start_time = time.time()
+            
             raw_results = self.api_wrapper.raw_results(
                 query,
                 self.max_results,
@@ -117,9 +126,25 @@ class TavilySearchResultsWithImages(TavilySearchResults):  # type: ignore[overri
                 self.include_images,
                 self.include_image_descriptions,
             )
+            
+            api_time = time.time() - start_time
+            logger.info(f"TavilySearch: API call completed in {api_time:.3f} seconds")
+            
+            if "results" in raw_results:
+                logger.info(f"TavilySearch: Received {len(raw_results['results'])} search results")
+            if "images" in raw_results and raw_results["images"]:
+                logger.info(f"TavilySearch: Received {len(raw_results['images'])} images")
+                
         except Exception as e:
+            logger.error(f"TavilySearch: API call failed with error: {repr(e)}")
             return repr(e), {}
+            
+        logger.info("TavilySearch: Processing and cleaning results")
+        start_time = time.time()
         cleaned_results = self.api_wrapper.clean_results_with_images(raw_results)
+        processing_time = time.time() - start_time
+        logger.info(f"TavilySearch: Results processed in {processing_time:.3f} seconds")
+        
         print("sync", json.dumps(cleaned_results, indent=2, ensure_ascii=False))
         return cleaned_results, raw_results
 
@@ -129,7 +154,16 @@ class TavilySearchResultsWithImages(TavilySearchResults):  # type: ignore[overri
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> Tuple[Union[List[Dict[str, str]], str], Dict]:
         """Use the tool asynchronously."""
+        import logging
+        import time
+        
+        logger = logging.getLogger(__name__)
+        logger.info(f"TavilySearch (async): Starting search for query: '{query}'")
+        
         try:
+            logger.info(f"TavilySearch (async): Calling Tavily API with query: '{query}', max_results: {self.max_results}")
+            start_time = time.time()
+            
             raw_results = await self.api_wrapper.raw_results_async(
                 query,
                 self.max_results,
@@ -141,8 +175,24 @@ class TavilySearchResultsWithImages(TavilySearchResults):  # type: ignore[overri
                 self.include_images,
                 self.include_image_descriptions,
             )
+            
+            api_time = time.time() - start_time
+            logger.info(f"TavilySearch (async): API call completed in {api_time:.3f} seconds")
+            
+            if "results" in raw_results:
+                logger.info(f"TavilySearch (async): Received {len(raw_results['results'])} search results")
+            if "images" in raw_results and raw_results["images"]:
+                logger.info(f"TavilySearch (async): Received {len(raw_results['images'])} images")
+                
         except Exception as e:
+            logger.error(f"TavilySearch (async): API call failed with error: {repr(e)}")
             return repr(e), {}
+            
+        logger.info("TavilySearch (async): Processing and cleaning results")
+        start_time = time.time()
         cleaned_results = self.api_wrapper.clean_results_with_images(raw_results)
+        processing_time = time.time() - start_time
+        logger.info(f"TavilySearch (async): Results processed in {processing_time:.3f} seconds")
+        
         print("async", json.dumps(cleaned_results, indent=2, ensure_ascii=False))
         return cleaned_results, raw_results

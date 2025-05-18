@@ -2,10 +2,16 @@
 # SPDX-License-Identifier: MIT
 
 import sys
+import logging
+import os
 
 from .article import Article
 from .jina_client import JinaClient
+from .crawl4ai_client import Crawl4aiClient
 from .readability_extractor import ReadabilityExtractor
+from src.config.tools import CRAWLER_TYPE, CRAWL4AI_URL
+
+logger = logging.getLogger(__name__)
 
 
 class Crawler:
@@ -15,13 +21,23 @@ class Crawler:
         # them into text and image blocks for one single and unified
         # LLM message.
         #
-        # Jina is not the best crawler on readability, however it's
-        # much easier and free to use.
-        #
-        # Instead of using Jina's own markdown converter, we'll use
-        # our own solution to get better readability results.
-        jina_client = JinaClient()
-        html = jina_client.crawl(url, return_format="html")
+        # Select the crawler based on configuration
+        if CRAWLER_TYPE == "crawl4ai":
+            if not CRAWL4AI_URL:
+                logger.warning("CRAWL4AI_URL is not set. Falling back to Jina.")
+                client = JinaClient()
+            else:
+                logger.info(f"Using Crawl4ai client with URL: {CRAWL4AI_URL}")
+                client = Crawl4aiClient(CRAWL4AI_URL)
+        else:
+            # Default to Jina
+            logger.info("Using Jina client")
+            client = JinaClient()
+            
+        # Get HTML content from the selected crawler
+        html = client.crawl(url, return_format="html")
+        
+        # Use our readability extractor to process the HTML
         extractor = ReadabilityExtractor()
         article = extractor.extract_article(html)
         article.url = url

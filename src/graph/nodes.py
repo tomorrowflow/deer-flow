@@ -19,6 +19,7 @@ from src.tools import (
     get_web_search_tool,
     python_repl_tool,
 )
+from src.tools.decorators import log_mcp_io
 
 from src.config.agents import AGENT_LLM_MAP
 from src.config.configuration import Configuration
@@ -450,9 +451,12 @@ async def _setup_and_execute_agent_step(
             loaded_tools = default_tools[:]
             for tool in client.get_tools():
                 if tool.name in enabled_tools:
+                    server_name = enabled_tools[tool.name]
                     tool.description = (
-                        f"Powered by '{enabled_tools[tool.name]}'.\n{tool.description}"
+                        f"Powered by '{server_name}'.\n{tool.description}"
                     )
+                    # Apply the log_mcp_io decorator to the tool's __call__ method
+                    tool.__call__ = log_mcp_io(server_name)(tool.__call__)
                     loaded_tools.append(tool)
             agent = create_agent(agent_type, agent_type, loaded_tools, agent_type)
             return await _execute_agent_step(state, agent, agent_type)

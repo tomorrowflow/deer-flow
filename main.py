@@ -7,11 +7,21 @@ Entry point script for the DeerFlow project.
 
 import argparse
 import asyncio
+import logging
 
 from InquirerPy import inquirer
 
 from src.config.questions import BUILT_IN_QUESTIONS, BUILT_IN_QUESTIONS_ZH_CN
 from src.workflow import run_agent_workflow_async
+from src.config.tools import SELECTED_SEARCH_ENGINE, CRAWLER_TYPE, CRAWL4AI_URL
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+
+logger = logging.getLogger(__name__)
 
 
 def ask(
@@ -97,6 +107,11 @@ def main(
 
 
 if __name__ == "__main__":
+    # Log the configured search engine and crawler type
+    logger.info(f"Using Search API: {SELECTED_SEARCH_ENGINE}")
+    logger.info(f"Using Crawler Type: {CRAWLER_TYPE}")
+    if CRAWLER_TYPE and CRAWLER_TYPE.lower() == "crawl4ai":
+        logger.info(f"Crawl4AI URL: {CRAWL4AI_URL if CRAWL4AI_URL else 'Not set'}")
     # Set up argument parser
     parser = argparse.ArgumentParser(description="Run the Deer")
     parser.add_argument("query", nargs="*", help="The query to process")

@@ -9,6 +9,7 @@ import argparse
 import logging
 
 import uvicorn
+from src.config.tools import SELECTED_SEARCH_ENGINE, CRAWLER_TYPE, CRAWL4AI_URL
 
 # Configure logging
 logging.basicConfig(
@@ -55,6 +56,12 @@ if __name__ == "__main__":
     if args.reload:
         reload = True
 
+    # Log the configured search engine and crawler type
+    logger.info(f"Using Search API: {SELECTED_SEARCH_ENGINE}")
+    logger.info(f"Using Crawler Type: {CRAWLER_TYPE}")
+    if CRAWLER_TYPE and CRAWLER_TYPE.lower() == "crawl4ai":
+        logger.info(f"Crawl4AI URL: {CRAWL4AI_URL if CRAWL4AI_URL else 'Not set'}")
+    
     logger.info("Starting DeerFlow API server")
     uvicorn.run(
         "src.server:app",

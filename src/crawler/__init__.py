@@ -3,8 +3,10 @@
 
 from .article import Article
 from .crawler import Crawler
+from .crawl4ai_client import Crawl4aiClient
 
 __all__ = [
     "Article",
     "Crawler",
+    "Crawl4aiClient",
 ]
