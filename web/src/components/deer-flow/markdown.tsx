@@ -79,6 +79,33 @@ export function Markdown({
 
 function CopyButton({ content }: { content: string }) {
   const [copied, setCopied] = useState(false);
+  
+  // Fallback function for browsers that don't support the Clipboard API
+  const fallbackCopyTextToClipboard = (text: string) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // Avoid scrolling to bottom
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        setCopied(true);
+      }
+    } catch (err) {
+      console.error('Fallback copy failed:', err);
+    }
+
+    document.body.removeChild(textArea);
+  };
+
   return (
     <Tooltip title="Copy">
       <Button
@@ -87,14 +114,25 @@ function CopyButton({ content }: { content: string }) {
         className="rounded-full"
         onClick={async () => {
           try {
+            // Try the modern Clipboard API first
             await navigator.clipboard.writeText(content);
             setCopied(true);
-            setTimeout(() => {
-              setCopied(false);
-            }, 1000);
-          } catch (error) {
-            console.error(error);
+          } catch (clipboardError) {
+            console.warn('Clipboard API failed, falling back to execCommand', clipboardError);
+            
+            // Fallback to older method if Clipboard API fails
+            try {
+              fallbackCopyTextToClipboard(content);
+            } catch (fallbackError) {
+              console.error('Both copy methods failed:', fallbackError);
+              setCopied(false); // Don't show success icon if it didn't work
+              return;
+            }
           }
+
+          setTimeout(() => {
+            setCopied(false);
+          }, 1000);
         }}
       >
         {copied ? (

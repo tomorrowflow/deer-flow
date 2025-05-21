@@ -16,18 +16,21 @@ import "./src/env.js";
 // is still evolving and may not yet be fully stable for production environments.
 
 const config = {
-  // For development mode
-  turbopack: {
-    rules: {
-      "*.md": {
-        loaders: ["raw-loader"],
-        as: "*.js",
-      },
-    },
-  },
+  // Allow cross-origin requests from Traefik proxy
+  allowedDevOrigins: JSON.parse(process.env.ALLOWED_DEV_ORIGINS || '[]'),
+  
+ // For development mode
+ turbopack: {
+   rules: {
+     "*.md": {
+       loaders: ["raw-loader"],
+       as: "*.js",
+     },
+   },
+ },
 
-  // For production mode
-  webpack: (config) => {
+ // For production mode
+ webpack: (config) => {
     config.module.rules.push({
       test: /\.md$/,
       use: "raw-loader",
